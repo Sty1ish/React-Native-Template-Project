@@ -1,0 +1,16 @@
+source "https://rubygems.org"
+
+# Ruby 3.4.0 has removed some libraries from the standard library.
+gem 'bigdecimal'
+gem 'logger'
+gem 'benchmark'
+gem 'mutex_m'
+gem 'abbrev'
+gem 'base64'
+gem 'drb'
+gem 'nkf'
+gem 'csv'
+
+# Use CocoaPods via Bundler for reproducible iOS builds
+gem "cocoapods", ">= 1.14.0"
+gem "xcodeproj", "< 1.27.0"
