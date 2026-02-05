@@ -13,6 +13,7 @@ import {
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { UserProvider } from './src/app/providers/UserProvider';
+import { QueryProvider } from './src/app/providers/QueryProvider';
 import { RootNavigator } from './src/app/routers/RootNavigator';
 import { GlobalBottomSheet } from './src/widget/bottom-sheet';
 
@@ -22,13 +23,15 @@ function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
-        <UserProvider>
-          <BottomSheetModalProvider>
-            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-            <RootNavigator />
-            <GlobalBottomSheet />
-          </BottomSheetModalProvider>
-        </UserProvider>
+        <QueryProvider>
+          <UserProvider>
+            <BottomSheetModalProvider>
+              <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+              <RootNavigator />
+              <GlobalBottomSheet />
+            </BottomSheetModalProvider>
+          </UserProvider>
+        </QueryProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
