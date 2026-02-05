@@ -2,6 +2,10 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "src/shared/asset/font/fontConfig.ts",
+      "sha1": "705906142c5fe3758b0f6072861cf8089a09366a"
+    },
+    {
       "path": "src/shared/asset/font/NotoSansKR-Light.ttf",
       "sha1": "fe043bf69c812dcd39a216bc1766936e8d64b254"
     },
