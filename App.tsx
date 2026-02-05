@@ -10,19 +10,27 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { UserProvider } from './src/app/providers/UserProvider';
 import { RootNavigator } from './src/app/routers/RootNavigator';
+import { GlobalBottomSheet } from './src/widget/bottom-sheet';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaProvider>
-      <UserProvider>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <RootNavigator />
-      </UserProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <SafeAreaProvider>
+        <UserProvider>
+          <BottomSheetModalProvider>
+            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <RootNavigator />
+            <GlobalBottomSheet />
+          </BottomSheetModalProvider>
+        </UserProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
