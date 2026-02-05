@@ -3,7 +3,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { MainPage } from '../../pages/MainPage';
-import { withSafeArea } from '../../shared/ui/withSafeArea';
+import { withSafeArea } from '../../shared/lib/withSafeArea';
 
 export type RootStackParamList = {
   MainPage: undefined;
