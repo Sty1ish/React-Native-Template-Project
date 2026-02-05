@@ -10,7 +10,8 @@ export const showLoginModal = () => {
   const { open } = useBottomSheetStore.getState();
   
   open(<LoginBottomSheet />, {
-    snapPoints: ['60%'], // 로그인 창에 적합한 높이
+    snapPoints: ['80%'], // 로그인 창 높이 80%로 설정
+    enableDynamicSizing: false,
     backdropPressBehavior: 'close',
   });
 };

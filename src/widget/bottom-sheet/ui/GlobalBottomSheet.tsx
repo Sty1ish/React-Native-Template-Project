@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export const GlobalBottomSheet = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const { 
-    isOpen, content, snapPoints, close,
+    isOpen, content, snapPoints, enableDynamicSizing, close,
     backdropOpacity, backdropPressBehavior
   } = useBottomSheetStore();
   const { bottom: bottomSafe } = useSafeAreaInsets();
@@ -51,7 +51,8 @@ export const GlobalBottomSheet = () => {
     <BottomSheetModal
       ref={bottomSheetRef}
       index={0} // 열렸을 때 첫번째 snapPoint 사용
-      snapPoints={snapPoints}
+      snapPoints={enableDynamicSizing ? undefined : snapPoints}
+      enableDynamicSizing={enableDynamicSizing}
       backdropComponent={renderBackdrop}
       onDismiss={handleDismiss}
       enablePanDownToClose={true} // 드래그해서 닫기 가능

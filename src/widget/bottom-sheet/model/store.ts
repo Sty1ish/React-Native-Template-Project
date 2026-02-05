@@ -6,6 +6,8 @@ interface BottomSheetState {
   content: React.ReactNode | null;
   /** snapPoints (예: ['25%', '50%']) - 기본값 ['50%'] */
   snapPoints: (string | number)[];
+  /** 콘텐츠 크기에 맞춰 높이 자동 조절 (v5 기능) */
+  enableDynamicSizing: boolean;
   
   // --- Backdrop Options ---
   /** 백드롭 투명도 (기본 0.5) */
@@ -18,6 +20,7 @@ interface BottomSheetState {
     content: React.ReactNode, 
     options?: { 
       snapPoints?: (string | number)[];
+      enableDynamicSizing?: boolean;
       backdropOpacity?: number;
       backdropPressBehavior?: 'none' | 'close' | 'collapse';
     }
@@ -30,6 +33,7 @@ export const useBottomSheetStore = create<BottomSheetState>((set, get) => ({
   isOpen: false,
   content: null,
   snapPoints: ['50%'],
+  enableDynamicSizing: false,
   backdropOpacity: 0.5,
   backdropPressBehavior: 'close',
 
@@ -44,6 +48,7 @@ export const useBottomSheetStore = create<BottomSheetState>((set, get) => ({
       isOpen: true,
       content,
       snapPoints: options?.snapPoints ?? ['50%'],
+      enableDynamicSizing: options?.enableDynamicSizing ?? false,
       backdropOpacity: options?.backdropOpacity ?? 0.5,
       backdropPressBehavior: options?.backdropPressBehavior ?? 'close',
     });
