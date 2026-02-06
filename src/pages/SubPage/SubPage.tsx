@@ -7,12 +7,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CollapsibleHeader } from '../../widget/header';
+import { CollapsibleFooter } from '../../widget/footer';
 
 export const SubPage = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   
-  // 스크롤 값만 공유 (로직은 헤더 내부로 위임)
+  // 스크롤 값만 공유 (로직은 헤더/푸터 내부로 위임)
   const scrollY = useSharedValue(0);
   
   const scrollHandler = useAnimatedScrollHandler({
@@ -22,15 +23,14 @@ export const SubPage = () => {
   });
 
   // 헤더 높으는 CollapsibleHeader 내부 로직과 맞춤 (50 + top)
-  // safeAreaInset을 고려하여 패딩을 줍니다.
   const HEADER_HEIGHT_ESTIMATE = 50 + insets.top;
+  // 푸터 높이도 내부 로직과 맞춤 (60 + bottom) - 하단 패딩 확보용
+  const FOOTER_HEIGHT_ESTIMATE = 60 + insets.bottom;
 
   return (
     <View style={styles.container}>
       {/* 
         Case B: 스크롤 시 사라졌다 나타나는 헤더
-        - 애니메이션 로직, 높이 계산 등은 컴포넌트 내부로 숨겨짐
-        - 외부에서는 scrollY 값만 전달하면 됨
       */}
       <CollapsibleHeader
         scrollY={scrollY}
@@ -44,8 +44,8 @@ export const SubPage = () => {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         contentContainerStyle={{
-            paddingTop: HEADER_HEIGHT_ESTIMATE, // 헤더가 absolute이므로 여백 필요
-            paddingBottom: insets.bottom + 20 
+            paddingTop: HEADER_HEIGHT_ESTIMATE, // 헤더 여백
+            paddingBottom: FOOTER_HEIGHT_ESTIMATE + 20 // 푸터 여백 + 추가 여백
         }}
       >
         <Description />
@@ -56,6 +56,15 @@ export const SubPage = () => {
           </View>
         ))}
       </Animated.ScrollView>
+
+        {/* 
+        Case B: 스크롤 시 사라졌다 나타나는 푸터
+        - Header와 동일하게 scrollY 공유
+      */}
+      <CollapsibleFooter 
+        scrollY={scrollY}
+        onPressTab={(idx) => console.log('SubPage Footer Tab:', idx)}
+      />
     </View>
   );
 };

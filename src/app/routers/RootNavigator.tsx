@@ -14,11 +14,11 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // HOC가 적용된 컴포넌트들
-// MainPage에서 자체 헤더(FixedHeader)를 쓰므로 상단 Safe Area 처리는 헤더에게 위임합니다 (top: false)
-const SafeMainPage = withSafeArea(MainPage, { top: false });
-// SubPage는 내부에서 처리하므로 withSafeArea 옵션을 조정하거나, 그냥 둡니다.
-// SubPage는 CollapsibleHeader가 Absolute로 떠있지만, 하단 Safe Area는 필요하므로 bottom: true, top: false로 설정
-const SafeSubPage = withSafeArea(SubPage, { top: false });
+// MainPage에서 자체 헤더(FixedHeader), 푸터(FixedFooter)를 사용하므로 둘 다 false
+const SafeMainPage = withSafeArea(MainPage, { top: false, bottom : false});
+// SubPage에서는 CollapsibleHeader, CollapsibleFooter를 사용하므로 둘 다 false
+const SafeSubPage = withSafeArea(SubPage, { top: false, bottom : false});
+// 만약 헤더나 푸터가 존재하지 않는 페이지라면, withSafeArea의 옵션을 true로 설정하여 안전 패딩을 설정해야합니다
 
 export const RootNavigator = () => {
   return (

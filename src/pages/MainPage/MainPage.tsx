@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { BaseText } from '../../shared/ui/BaseText';
 import { showLoginModal } from '../../features/auth';
 import { FixedHeader } from '../../widget/header';
+import { FixedFooter } from '../../widget/footer';
 
 export const MainPage = () => {
     const navigation = useNavigation<any>();
@@ -39,6 +40,11 @@ export const MainPage = () => {
                     />
                 </View>
             </View>
+
+            {/* Case A: 고정 푸터 */}
+            <FixedFooter 
+                onPressTab={(index) => console.log(`Tab ${index} pressed`)}
+            />
         </View>
     );
 };
