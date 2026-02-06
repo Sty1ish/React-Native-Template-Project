@@ -1,6 +1,6 @@
 import React from 'react';
-import {Text, TextProps, TextStyle} from 'react-native';
-import {FontConfig, FontType} from '../asset/font/fontConfig';
+import { Text, TextProps, TextStyle } from 'react-native';
+import { FontConfig, FontType } from '../asset/font/fontConfig';
 
 export interface BaseTextProps extends TextProps {
   /**
@@ -35,17 +35,17 @@ export const BaseText = ({
   // style보다 우선순위를 높이기 위해 배열의 마지막에 추가합니다.
   // 값이 undefined인 경우 빈 객체가 되어 style의 값이 적용됩니다.
   const additionalStyles: TextStyle = {
-    ...(color !== undefined && {color}),
-    ...(fontSize !== undefined && {fontSize}),
-    ...(textAlign !== undefined && {textAlign}),
+    ...(color !== undefined && { color }),
+    ...(fontSize !== undefined && { fontSize }),
+    ...(textAlign !== undefined && { textAlign }),
   };
 
   return (
     <Text
       style={[
-        {fontFamily: FontConfig[font]}, // 기본 폰트 설정
-        style,                          // 사용자가 전달한 style
-        additionalStyles,               // 직접 전달된 Prop (최우선 순위)
+        { fontFamily: FontConfig[font] }, // 기본 폰트 설정
+        style, // 사용자가 전달한 style
+        additionalStyles, // 직접 전달된 Prop (최우선 순위)
       ]}
       {...props}
     />

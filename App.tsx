@@ -23,7 +23,9 @@ function App() {
         <QueryProvider>
           <UserProvider>
             <BottomSheetModalProvider>
-              <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+              <StatusBar
+                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+              />
               <RootNavigator />
               <GlobalBottomSheet />
             </BottomSheetModalProvider>

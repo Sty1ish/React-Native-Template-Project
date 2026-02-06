@@ -5,8 +5,8 @@ import FastImageLib, {
   Priority,
   ResizeMode,
 } from '@d11/react-native-fast-image';
-import React, {memo, useCallback, useState} from 'react';
-import {DimensionValue, StyleSheet} from 'react-native';
+import React, { memo, useCallback, useState } from 'react';
+import { DimensionValue, StyleSheet } from 'react-native';
 
 /**
  * FastImage
@@ -103,10 +103,10 @@ export const FastImage = memo(function FastImage(props: Props) {
 
   // 스타일 조합
   const computedStyle: FastImageStyle = {
-    ...(width && {width}),
-    ...(height && {height}),
-    ...(borderRadius && {borderRadius}),
-    ...(backgroundColor && {backgroundColor: backgroundColor}),
+    ...(width && { width }),
+    ...(height && { height }),
+    ...(borderRadius && { borderRadius }),
+    ...(backgroundColor && { backgroundColor: backgroundColor }),
     ...StyleSheet.flatten(style),
   };
 
@@ -121,25 +121,23 @@ export const FastImage = memo(function FastImage(props: Props) {
           headers: {
             Accept: 'image/webp,image/apng,image/*,*/*;q=0.8',
             'Cache-Control': 'no-cache', // presigned URL은 캐시하지 않음
-            'User-Agent':
-              'Mozilla/5.0 (compatible; React Native FastImage)',
+            'User-Agent': 'Mozilla/5.0 (compatible; React Native FastImage)',
           },
         }
       : typeof source === 'object' && source !== null && 'uri' in source
-      ? {
-          uri: source.uri, // URI 재인코딩 방지
-          priority: source.priority || fastImagePriority,
-          cache: source.cache || fastImageCache,
-          // 기존 헤더 유지하되 presigned URL 안전성 추가
-          headers: {
-            Accept: 'image/webp,image/apng,image/*,*/*;q=0.8',
-            'Cache-Control': 'no-cache',
-            'User-Agent':
-              'Mozilla/5.0 (compatible; React Native FastImage)',
-            ...(source.headers || {}), // 기존 헤더 우선
-          },
-        }
-      : source;
+        ? {
+            uri: source.uri, // URI 재인코딩 방지
+            priority: source.priority || fastImagePriority,
+            cache: source.cache || fastImageCache,
+            // 기존 헤더 유지하되 presigned URL 안전성 추가
+            headers: {
+              Accept: 'image/webp,image/apng,image/*,*/*;q=0.8',
+              'Cache-Control': 'no-cache',
+              'User-Agent': 'Mozilla/5.0 (compatible; React Native FastImage)',
+              ...(source.headers || {}), // 기존 헤더 우선
+            },
+          }
+        : source;
 
   return (
     <FastImageLib
@@ -214,7 +212,7 @@ export const clearDiskCache = () => {
 };
 
 export const preload = (
-  sources: Array<{uri: string; headers?: {[key: string]: string}}>,
+  sources: Array<{ uri: string; headers?: { [key: string]: string } }>,
 ) => {
   try {
     if (

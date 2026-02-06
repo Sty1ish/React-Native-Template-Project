@@ -10,20 +10,25 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const GlobalBottomSheet = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const { 
-    isOpen, content, snapPoints, enableDynamicSizing, close,
-    backdropOpacity, backdropPressBehavior
+  const {
+    isOpen,
+    content,
+    snapPoints,
+    enableDynamicSizing,
+    close,
+    backdropOpacity,
+    backdropPressBehavior,
   } = useBottomSheetStore();
   const { bottom: bottomSafe } = useSafeAreaInsets();
 
   // 상태(isOpen) 변경에 따라 모달 제어
   useEffect(() => {
     if (isOpen) {
-        // 키보드가 내려가는 동작이 필요할 수도 있음
-        Keyboard.dismiss();
-        bottomSheetRef.current?.present();
+      // 키보드가 내려가는 동작이 필요할 수도 있음
+      Keyboard.dismiss();
+      bottomSheetRef.current?.present();
     } else {
-        bottomSheetRef.current?.dismiss();
+      bottomSheetRef.current?.dismiss();
     }
   }, [isOpen]);
 
@@ -41,10 +46,10 @@ export const GlobalBottomSheet = () => {
         pressBehavior={backdropPressBehavior} // Store 값 동적 적용
         appearsOnIndex={0}
         disappearsOnIndex={-1}
-        opacity={backdropOpacity}          // Store 값 동적 적용
+        opacity={backdropOpacity} // Store 값 동적 적용
       />
     ),
-    [backdropOpacity, backdropPressBehavior] // 의존성 추가
+    [backdropOpacity, backdropPressBehavior], // 의존성 추가
   );
 
   return (
@@ -60,19 +65,19 @@ export const GlobalBottomSheet = () => {
       keyboardBlurBehavior="restore"
       containerStyle={styles.container}
     >
-        {/* SafeArea 대응 및 컨텐츠 렌더링 */}
-        {/* 
+      {/* SafeArea 대응 및 컨텐츠 렌더링 */}
+      {/* 
             BottomSheetModal 내부는 자동 SafeArea 처리가 안될 수 있으므로,
             필요에 따라 Padding을 주거나, Content 내부에서 처리하도록 합니다.
             여기서는 Content를 그대로 렌더링합니다.
         */}
-        {content}
+      {content}
     </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        // 모달 컨테이너 스타일 (필요시 추가)
-    }
+  container: {
+    // 모달 컨테이너 스타일 (필요시 추가)
+  },
 });

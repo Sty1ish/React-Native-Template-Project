@@ -1,4 +1,4 @@
-import React, {forwardRef, memo, useMemo} from 'react';
+import React, { forwardRef, memo, useMemo } from 'react';
 import {
   View,
   ViewProps,
@@ -120,25 +120,25 @@ const mapAlign = (v?: Align): ViewStyle['alignItems'] =>
   v === 'start'
     ? 'flex-start'
     : v === 'end'
-    ? 'flex-end'
-    : v === 'stretch'
-    ? 'stretch'
-    : v === 'baseline'
-    ? 'baseline'
-    : 'center';
+      ? 'flex-end'
+      : v === 'stretch'
+        ? 'stretch'
+        : v === 'baseline'
+          ? 'baseline'
+          : 'center';
 
 const mapJustify = (v?: Justify): ViewStyle['justifyContent'] =>
   v === 'start'
     ? 'flex-start'
     : v === 'end'
-    ? 'flex-end'
-    : v === 'between'
-    ? 'space-between'
-    : v === 'around'
-    ? 'space-around'
-    : v === 'evenly'
-    ? 'space-evenly'
-    : 'center';
+      ? 'flex-end'
+      : v === 'between'
+        ? 'space-between'
+        : v === 'around'
+          ? 'space-around'
+          : v === 'evenly'
+            ? 'space-evenly'
+            : 'center';
 
 const convertColorWithOpacity = (color: string, opacity: number): string => {
   const named: Record<string, string> = {
@@ -166,7 +166,11 @@ const convertColorWithOpacity = (color: string, opacity: number): string => {
   const norm = named[color?.toLowerCase?.()] || color;
   if (norm?.startsWith?.('#')) {
     let hex = norm.slice(1);
-    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    if (hex.length === 3)
+      hex = hex
+        .split('')
+        .map(c => c + c)
+        .join('');
     if (hex.length === 6) {
       const r = parseInt(hex.slice(0, 2), 16);
       const g = parseInt(hex.slice(2, 4), 16);
@@ -304,9 +308,16 @@ export const AutoLayout = memo(
       if (radiusTopLeft != null) r.borderTopLeftRadius = radiusTopLeft;
       if (radiusTopRight != null) r.borderTopRightRadius = radiusTopRight;
       if (radiusBottomLeft != null) r.borderBottomLeftRadius = radiusBottomLeft;
-      if (radiusBottomRight != null) r.borderBottomRightRadius = radiusBottomRight;
+      if (radiusBottomRight != null)
+        r.borderBottomRightRadius = radiusBottomRight;
       return r;
-    }, [radius, radiusTopLeft, radiusTopRight, radiusBottomLeft, radiusBottomRight]);
+    }, [
+      radius,
+      radiusTopLeft,
+      radiusTopRight,
+      radiusBottomLeft,
+      radiusBottomRight,
+    ]);
 
     const radiusImage: ImageStyle = useMemo(() => {
       const r: ImageStyle = {};
@@ -314,9 +325,16 @@ export const AutoLayout = memo(
       if (radiusTopLeft != null) r.borderTopLeftRadius = radiusTopLeft;
       if (radiusTopRight != null) r.borderTopRightRadius = radiusTopRight;
       if (radiusBottomLeft != null) r.borderBottomLeftRadius = radiusBottomLeft;
-      if (radiusBottomRight != null) r.borderBottomRightRadius = radiusBottomRight;
+      if (radiusBottomRight != null)
+        r.borderBottomRightRadius = radiusBottomRight;
       return r;
-    }, [radius, radiusTopLeft, radiusTopRight, radiusBottomLeft, radiusBottomRight]);
+    }, [
+      radius,
+      radiusTopLeft,
+      radiusTopRight,
+      radiusBottomLeft,
+      radiusBottomRight,
+    ]);
 
     const dyn = useMemo<ViewStyle>(() => {
       const s: ViewStyle = {};
@@ -419,7 +437,10 @@ export const AutoLayout = memo(
       if (shadowOpacity != null) s.shadowOpacity = shadowOpacity;
       if (shadowRadius != null) s.shadowRadius = shadowRadius;
       if ((shadowOffsetX ?? shadowOffsetY) != null) {
-        s.shadowOffset = {width: shadowOffsetX ?? 0, height: shadowOffsetY ?? 0};
+        s.shadowOffset = {
+          width: shadowOffsetX ?? 0,
+          height: shadowOffsetY ?? 0,
+        };
       }
       if (elevation != null) s.elevation = elevation;
 
@@ -497,7 +518,8 @@ export const AutoLayout = memo(
           resizeMode={bgImageResizeMode}
           imageStyle={radiusImage}
           {...rest}
-          style={[dirStyle, dyn, style]}>
+          style={[dirStyle, dyn, style]}
+        >
           {children}
         </ImageBackground>
       );
@@ -512,6 +534,6 @@ export const AutoLayout = memo(
 );
 
 const styles = StyleSheet.create({
-  row: {flexDirection: 'row'},
-  col: {flexDirection: 'column'},
+  row: { flexDirection: 'row' },
+  col: { flexDirection: 'column' },
 });

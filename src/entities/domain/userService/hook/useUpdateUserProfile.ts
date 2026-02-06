@@ -9,15 +9,15 @@ import { ApiResponse } from '../../../common/http';
  * 성공 시 사용자 프로필 쿼리를 무효화하여 최신 데이터를 다시 가져옵니다.
  */
 export const useUpdateUserProfile = (userId: number) => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation<ApiResponse<UserProfile>, Error, Partial<UserProfile>>({
-        mutationFn: (data) => updateUserProfile(userId, data),
-        onSuccess: () => {
-            // 수정 성공 시, 해당 유저의 프로필 쿼리 캐시를 무효화 -> 자동 재조회 트리거
-            queryClient.invalidateQueries({
-                queryKey: userKeys.profile(userId),
-            });
-        },
-    });
+  return useMutation<ApiResponse<UserProfile>, Error, Partial<UserProfile>>({
+    mutationFn: data => updateUserProfile(userId, data),
+    onSuccess: () => {
+      // 수정 성공 시, 해당 유저의 프로필 쿼리 캐시를 무효화 -> 자동 재조회 트리거
+      queryClient.invalidateQueries({
+        queryKey: userKeys.profile(userId),
+      });
+    },
+  });
 };

@@ -16,21 +16,21 @@ interface SafeAreaOptions {
 /**
  * 컴포넌트를 Safe Area 처리가 된 View로 감싸주는 HOC입니다.
  * Page 컴포넌트 내부에서 반복적인 Safe Area 처리를 제거하기 위해 사용합니다.
- * 
+ *
  * @example
  * // Router 등록 시
  * <Stack.Screen name="Main" component={withSafeArea(MainPage)} />
- * 
+ *
  * // 옵션 지정 시
  * <Stack.Screen name="Detail" component={withSafeArea(DetailPage, { bottom: false, backgroundColor: '#f0f0f0' })} />
  */
 export function withSafeArea<P extends object>(
   Component: React.ComponentType<P>,
-  options: SafeAreaOptions = {}
+  options: SafeAreaOptions = {},
 ) {
   return function WithSafeAreaWrapper(props: P) {
     const insets = useSafeAreaInsets();
-    
+
     // 옵션 기본값 처리
     const {
       top = true,

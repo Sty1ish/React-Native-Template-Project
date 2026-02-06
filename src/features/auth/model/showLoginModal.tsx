@@ -8,7 +8,7 @@ import { LoginBottomSheet } from '../ui/LoginBottomSheet';
  */
 export const showLoginModal = () => {
   const { open } = useBottomSheetStore.getState();
-  
+
   open(<LoginBottomSheet />, {
     snapPoints: ['80%'], // 로그인 창 높이 80%로 설정
     enableDynamicSizing: false,

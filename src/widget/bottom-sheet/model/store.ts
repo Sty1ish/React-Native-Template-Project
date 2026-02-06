@@ -8,7 +8,7 @@ interface BottomSheetState {
   snapPoints: (string | number)[];
   /** 콘텐츠 크기에 맞춰 높이 자동 조절 (v5 기능) */
   enableDynamicSizing: boolean;
-  
+
   // --- Backdrop Options ---
   /** 백드롭 투명도 (기본 0.5) */
   backdropOpacity: number;
@@ -17,13 +17,13 @@ interface BottomSheetState {
 
   /** 바텀시트 열기 */
   open: (
-    content: React.ReactNode, 
-    options?: { 
+    content: React.ReactNode,
+    options?: {
       snapPoints?: (string | number)[];
       enableDynamicSizing?: boolean;
       backdropOpacity?: number;
       backdropPressBehavior?: 'none' | 'close' | 'collapse';
-    }
+    },
   ) => void;
   /** 바텀시트 닫기 */
   close: () => void;
@@ -40,7 +40,9 @@ export const useBottomSheetStore = create<BottomSheetState>((set, get) => ({
   open: (content, options) => {
     // 이미 열려있다면 중복 실행 방지 (요구사항)
     if (get().isOpen) {
-      console.warn('[GlobalBottomSheet] 이미 실행 중인 바텀시트가 있습니다. 먼저 닫아주세요.');
+      console.warn(
+        '[GlobalBottomSheet] 이미 실행 중인 바텀시트가 있습니다. 먼저 닫아주세요.',
+      );
       return;
     }
 
@@ -57,7 +59,7 @@ export const useBottomSheetStore = create<BottomSheetState>((set, get) => ({
   close: () => {
     set({
       isOpen: false,
-      content: null, 
+      content: null,
       // 옵션들은 굳이 초기화 안해도 다음 open때 덮어씌워짐
     });
   },

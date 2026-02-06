@@ -1,6 +1,6 @@
-import React, {forwardRef} from 'react';
-import {TextInput, TextInputProps, TextStyle} from 'react-native';
-import {FontConfig, FontType} from '../asset/font/fontConfig';
+import React, { forwardRef } from 'react';
+import { TextInput, TextInputProps, TextStyle } from 'react-native';
+import { FontConfig, FontType } from '../asset/font/fontConfig';
 
 export interface BaseTextInputProps extends TextInputProps {
   /**
@@ -88,15 +88,29 @@ export const BaseTextInput = forwardRef<TextInput, BaseTextInputProps>(
       fontSize,
       textAlign,
       // Spacing
-      p, px, py, pt, pr, pb, pl,
+      p,
+      px,
+      py,
+      pt,
+      pr,
+      pb,
+      pl,
       // Background
       bg,
       // Radius
-      radius, radiusTopLeft, radiusTopRight, radiusBottomLeft, radiusBottomRight,
+      radius,
+      radiusTopLeft,
+      radiusTopRight,
+      radiusBottomLeft,
+      radiusBottomRight,
       // Border
-      borderWidth, borderColor,
-      borderTopWidth, borderRightWidth, borderBottomWidth, borderLeftWidth,
-      
+      borderWidth,
+      borderColor,
+      borderTopWidth,
+      borderRightWidth,
+      borderBottomWidth,
+      borderLeftWidth,
+
       style,
       ...props
     },
@@ -105,28 +119,36 @@ export const BaseTextInput = forwardRef<TextInput, BaseTextInputProps>(
     // 우선순위가 높은 차원 설정값 처리를 위해 별도 객체 생성
     const layoutStyles: TextStyle = {
       // Background
-      ...(bg !== undefined && {backgroundColor: bg}),
+      ...(bg !== undefined && { backgroundColor: bg }),
 
       // Border Radius
-      ...(radius !== undefined && {borderRadius: radius}),
-      ...(radiusTopLeft !== undefined && {borderTopLeftRadius: radiusTopLeft}),
-      ...(radiusTopRight !== undefined && {borderTopRightRadius: radiusTopRight}),
-      ...(radiusBottomLeft !== undefined && {borderBottomLeftRadius: radiusBottomLeft}),
-      ...(radiusBottomRight !== undefined && {borderBottomRightRadius: radiusBottomRight}),
+      ...(radius !== undefined && { borderRadius: radius }),
+      ...(radiusTopLeft !== undefined && {
+        borderTopLeftRadius: radiusTopLeft,
+      }),
+      ...(radiusTopRight !== undefined && {
+        borderTopRightRadius: radiusTopRight,
+      }),
+      ...(radiusBottomLeft !== undefined && {
+        borderBottomLeftRadius: radiusBottomLeft,
+      }),
+      ...(radiusBottomRight !== undefined && {
+        borderBottomRightRadius: radiusBottomRight,
+      }),
 
       // Border
-      ...(borderColor !== undefined && {borderColor}),
-      ...(borderWidth !== undefined && {borderWidth}),
-      ...(borderTopWidth !== undefined && {borderTopWidth}),
-      ...(borderRightWidth !== undefined && {borderRightWidth}),
-      ...(borderBottomWidth !== undefined && {borderBottomWidth}),
-      ...(borderLeftWidth !== undefined && {borderLeftWidth}),
+      ...(borderColor !== undefined && { borderColor }),
+      ...(borderWidth !== undefined && { borderWidth }),
+      ...(borderTopWidth !== undefined && { borderTopWidth }),
+      ...(borderRightWidth !== undefined && { borderRightWidth }),
+      ...(borderBottomWidth !== undefined && { borderBottomWidth }),
+      ...(borderLeftWidth !== undefined && { borderLeftWidth }),
     };
 
     // Padding (높은 차원 값이 있으면 낮은 차원 값은 무시되므로 순서 중요하지 않음 - RN은 구체적인 속성이 우선)
     // 하지만 RN에서는 padding과 paddingVertical이 같이 있으면 paddingVertical이 우선됨.
     // 여기서는 명시적으로 값을 병합함.
-    
+
     if (p !== undefined) layoutStyles.padding = p;
     if (px !== undefined) layoutStyles.paddingHorizontal = px;
     if (py !== undefined) layoutStyles.paddingVertical = py;
@@ -137,9 +159,9 @@ export const BaseTextInput = forwardRef<TextInput, BaseTextInputProps>(
 
     // style보다 우선순위를 높이기 위해 별도 객체 생성
     const additionalStyles: TextStyle = {
-      ...(color !== undefined && {color}),
-      ...(fontSize !== undefined && {fontSize}),
-      ...(textAlign !== undefined && {textAlign}),
+      ...(color !== undefined && { color }),
+      ...(fontSize !== undefined && { fontSize }),
+      ...(textAlign !== undefined && { textAlign }),
     };
 
     return (

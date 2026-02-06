@@ -81,45 +81,46 @@ const secureStorage: StateStorage = {
 
 export const useUserStore = create<UserStore>()(
   persist(
-    (set) => ({
+    set => ({
       user: null,
       tokens: null,
       device: {
         timezone: 'Asia/Seoul', // 기본값
-        language: 'ko',         // 기본값
+        language: 'ko', // 기본값
       },
       isInitialized: false,
       isLoading: true, // 초기 로딩 상태
 
-      setUserInfo: (user) => set({ user }),
-      setTokens: (tokens) => set({ tokens }),
-      setDeviceInfo: (info) => set((state) => ({ 
-        device: { ...state.device, ...info } 
-      })),
-      setInitialized: (state) => set({ isInitialized: state }),
-      setLoading: (state) => set({ isLoading: state }),
+      setUserInfo: user => set({ user }),
+      setTokens: tokens => set({ tokens }),
+      setDeviceInfo: info =>
+        set(state => ({
+          device: { ...state.device, ...info },
+        })),
+      setInitialized: state => set({ isInitialized: state }),
+      setLoading: state => set({ isLoading: state }),
       logout: () => {
-        set((state) => ({ 
-            user: null, 
-            tokens: null, 
-            // device 정보는 로그아웃해도 유지 (기기 설정이므로)
-            device: state.device,
-            isInitialized: true, 
-            isLoading: false 
+        set(state => ({
+          user: null,
+          tokens: null,
+          // device 정보는 로그아웃해도 유지 (기기 설정이므로)
+          device: state.device,
+          isInitialized: true,
+          isLoading: false,
         }));
       },
     }),
     {
       name: SECURE_STORAGE_KEY, // 스토리지 Key
       storage: createJSONStorage(() => secureStorage), // 커스텀 보안 스토리지 적용
-      partialize: (state) => ({ user: state.user, tokens: state.tokens }), // device값은 persist에서 제외 (매번 앱 켤때마다 갱신)
-      onRehydrateStorage: () => (state) => {
+      partialize: state => ({ user: state.user, tokens: state.tokens }), // device값은 persist에서 제외 (매번 앱 켤때마다 갱신)
+      onRehydrateStorage: () => state => {
         // Hydration(복구)이 끝난 후 실행
         if (state) {
           state.setInitialized(true);
           state.setLoading(false);
         }
       },
-    }
-  )
+    },
+  ),
 );
