@@ -3,6 +3,8 @@ import {
   LoginRequest,
   LoginResponse,
   RefreshAccessTokenResponse,
+  OAuthLoginRequest,
+  OAuthLoginResponse,
 } from '../dto/authDto';
 
 /**
@@ -13,6 +15,25 @@ export const loginApi = (data: LoginRequest): Promise<ApiResponse<LoginResponse>
   http<LoginResponse>('/auth/login', 'POST', {
     auth: 'none', // Public API - 토큰 불필요
     body: data,
+  });
+
+/**
+ * OAuth 로그인 (Public API)
+ * Firebase ID Token을 서버에 전달하여 우리 서버의 JWT를 발급받습니다.
+ *
+ * 플로우:
+ * 1. Firebase 소셜 로그인 (Google/Apple) 또는 Email/Password 로그인
+ * 2. Firebase에서 ID Token 획득
+ * 3. 이 함수로 서버에 ID Token 전달 → 서버 JWT 발급
+ */
+export const oauthLoginApi = (
+  data: OAuthLoginRequest,
+): Promise<ApiResponse<OAuthLoginResponse>> =>
+  http<OAuthLoginResponse>(`/auth/login/oauth2/${data.provider}`, 'POST', {
+    auth: 'none',
+    headers: {
+      Authorization: `Bearer ${data.idToken}`,
+    },
   });
 
 /**
