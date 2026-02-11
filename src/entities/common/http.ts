@@ -1,23 +1,31 @@
-import { useUserStore } from '../../shared/store/userStore';
+import { TokenManager } from '../../app/services/TokenManager';
 
 // TODO: 환경 변수 또는 설정 파일에서 관리 필요
 export const USERS_API_URL = 'https://api.your-domain.com';
 
-export interface ApiResponse<T> {
+export interface ApiResponse<T = any> {
+  timestamp: string;
+  status: number;
+  path: string;
   code: string;
+  message: string;
   data: T;
-  message?: string;
-  timestamp?: string;
-  status?: number;
-  path?: string;
 }
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-interface RequestOptions extends RequestInit {
-  auth?: boolean; // 기본 true
-  parseJson?: boolean; // 기본 true
-  // body는 string | FormData 허용
+/**
+ * 인증 모드
+ * - 'required': JWT 필수. 토큰이 없으면 에러를 throw (인증이 반드시 필요한 API)
+ * - 'optional': JWT 있으면 포함, 없으면 미포함으로 요청 (비로그인 사용자도 호출 가능한 API)
+ * - 'none'    : JWT를 포함하지 않음 (Public API, 로그인/회원가입 등)
+ */
+export type AuthMode = 'required' | 'optional' | 'none';
+
+interface RequestOptions extends Omit<RequestInit, 'body'> {
+  auth?: AuthMode; // 기본: 'required'
+  parseJson?: boolean; // 기본: true
+  body?: string | FormData | Record<string, any>;
 }
 
 const toUrl = (path: string) =>
@@ -34,7 +42,6 @@ async function handleResponse<T>(
   try {
     json = text ? JSON.parse(text) : null;
   } catch {
-    // 서버가 JSON이 아닐 경우(이례적) 최소한의 형태로 래핑
     throw {
       timestamp: new Date().toISOString(),
       status: res.status,
@@ -53,15 +60,15 @@ async function handleResponse<T>(
       message: 'Unknown error',
     };
 
-    // TODO: 401 에러 및 토큰 갱신 처리는 추후 TokenManager/Interceptors 도입 시 구현 필요
-    if (res.status === 401 && !hadToken) {
-      console.log(
-        '[http] 401 에러 감지 - 비로그인 상태에서 인증 필요 API 호출',
-      );
-      // globalApiErrorEmitter.emit(...)
+    // 401 에러 + 토큰이 있었던 경우 → 토큰 만료 가능성
+    // (토큰 갱신은 TokenManager.getValidAccessToken()에서 선제적으로 처리하므로,
+    //  여기 도달했다면 Refresh Token까지 만료된 상태일 가능성이 높음)
+    if (res.status === 401 && hadToken) {
+      console.log('[http] 401 에러 - 토큰이 더 이상 유효하지 않음');
+      TokenManager.logout();
     }
 
-    // 4xx 클라이언트 에러는 재시도해도 소용없으므로 재시도 안함 플래그 (React Query용)
+    // 4xx 클라이언트 에러는 재시도해도 소용없으므로 React Query 재시도 스킵 플래그
     if (res.status >= 400 && res.status < 500) {
       (error as any).skipRetry = true;
     }
@@ -72,12 +79,54 @@ async function handleResponse<T>(
   return json as ApiResponse<T>;
 }
 
+/**
+ * 인증 모드에 따라 Authorization 헤더를 설정합니다.
+ * - 'required': 토큰이 만료 임박이면 자동 갱신하고, 토큰이 없으면 에러 throw
+ * - 'optional': 토큰이 있으면 갱신 후 포함, 없으면 미포함
+ * - 'none': 헤더에 토큰을 포함하지 않음
+ *
+ * @returns [hadToken, accessToken | null]
+ */
+async function resolveAuth(
+  authMode: AuthMode,
+): Promise<[boolean, string | null]> {
+  if (authMode === 'none') {
+    return [false, null];
+  }
+
+  // getValidAccessToken은 만료 임박(1분 미만) 시 자동 갱신을 시도합니다
+  const accessToken = await TokenManager.getValidAccessToken();
+
+  if (!accessToken) {
+    if (authMode === 'required') {
+      throw {
+        timestamp: new Date().toISOString(),
+        status: 401,
+        path: '',
+        code: 'AUTH_REQUIRED',
+        message: '인증이 필요한 API입니다. 로그인 후 다시 시도해주세요.',
+        skipRetry: true,
+      };
+    }
+    // optional: 토큰 없이 진행
+    return [false, null];
+  }
+
+  return [true, accessToken];
+}
+
 export async function http<T>(
   path: string,
   method: HttpMethod = 'GET',
   options: RequestOptions = {},
 ): Promise<ApiResponse<T>> {
-  const { auth = true, parseJson = true, headers, body, ...rest } = options;
+  const {
+    auth = 'required',
+    parseJson = true,
+    headers,
+    body,
+    ...rest
+  } = options;
 
   const initHeaders: Record<string, string> = {
     Accept: 'application/json',
@@ -87,31 +136,26 @@ export async function http<T>(
     ...((headers as Record<string, string>) || {}),
   };
 
-  let hadToken = false;
+  // 인증 처리
+  const [hadToken, accessToken] = await resolveAuth(auth);
+  if (accessToken) {
+    initHeaders.Authorization = `Bearer ${accessToken}`;
+  }
 
-  if (auth) {
-    // TODO: TokenManager 도입 후 getValidAccessToken()으로 교체 필요
-    const tokens = useUserStore.getState().tokens;
-    const accessToken = tokens?.accessToken; // AuthTokens 인터페이스가 유연하므로 accessToken 필드 사용 가정
-
-    if (accessToken) {
-      initHeaders.Authorization = `Bearer ${accessToken}`;
-      hadToken = true;
-      console.log('[http] JWT 포함하여 요청:', path);
-    } else {
-      console.log('[http] JWT 없음 - 비로그인 상태로 요청:', { path });
-    }
+  // body 직렬화
+  let serializedBody: string | FormData | undefined;
+  if (body instanceof FormData) {
+    serializedBody = body;
+  } else if (typeof body === 'object' && body !== null) {
+    serializedBody = JSON.stringify(body);
+  } else if (typeof body === 'string') {
+    serializedBody = body;
   }
 
   const res = await fetch(toUrl(path), {
     method,
     headers: initHeaders,
-    body:
-      body instanceof FormData
-        ? body
-        : typeof body === 'object'
-          ? JSON.stringify(body)
-          : body,
+    body: serializedBody,
     ...rest,
   });
 
@@ -123,26 +167,22 @@ export const httpUpload = async <T>(
   endpoint: string,
   method: 'POST' | 'PUT' | 'PATCH',
   formData: FormData,
-  options: { auth?: boolean; headers?: Record<string, string> } = {},
+  options: {
+    auth?: AuthMode;
+    headers?: Record<string, string>;
+  } = {},
 ): Promise<ApiResponse<T>> => {
-  const { auth = true, headers = {} } = options;
+  const { auth = 'required', headers = {} } = options;
 
   const initHeaders: Record<string, string> = {
     Accept: 'application/json',
     ...headers,
   };
 
-  let hadToken = false;
-
-  // JWT 토큰 추가
-  if (auth) {
-    const tokens = useUserStore.getState().tokens;
-    const accessToken = tokens?.accessToken;
-
-    if (accessToken) {
-      initHeaders.Authorization = `Bearer ${accessToken}`;
-      hadToken = true;
-    }
+  // 인증 처리
+  const [hadToken, accessToken] = await resolveAuth(auth);
+  if (accessToken) {
+    initHeaders.Authorization = `Bearer ${accessToken}`;
   }
 
   const res = await fetch(toUrl(endpoint), {

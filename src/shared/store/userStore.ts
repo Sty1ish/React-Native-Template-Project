@@ -16,15 +16,17 @@ export interface DeviceInfo {
   language: string;
 }
 
-// 토큰 정보 또한, JWT여부나 필드명이 확정되지 않았으므로
-// 확장성을 위해 모든 키/값을 허용합니다.
+// JWT 인증 토큰 인터페이스
+// AccessToken은 TokenManager(메모리)에서 관리되므로 Store에는 포함하지 않음.
+// RefreshToken만 Keychain을 통해 영속 저장됩니다.
 export interface AuthTokens {
-  [key: string]: any;
+  refreshToken: string;
+  [key: string]: any; // 확장 필드 허용
 }
 
 interface UserStoreState {
   user: User | null;
-  tokens: AuthTokens | null;
+  refreshToken: string | null; // Keychain persist 대상 (AccessToken은 TokenManager 메모리에서 관리)
   device: DeviceInfo;
   isInitialized: boolean;
   isLoading: boolean;
@@ -32,7 +34,7 @@ interface UserStoreState {
 
 interface UserStoreActions {
   setUserInfo: (user: User) => void;
-  setTokens: (tokens: AuthTokens) => void;
+  setRefreshToken: (token: string) => void;
   setDeviceInfo: (info: Partial<DeviceInfo>) => void;
   setInitialized: (state: boolean) => void;
   setLoading: (state: boolean) => void;
@@ -83,16 +85,16 @@ export const useUserStore = create<UserStore>()(
   persist(
     set => ({
       user: null,
-      tokens: null,
+      refreshToken: null,
       device: {
-        timezone: 'Asia/Seoul', // 기본값
-        language: 'ko', // 기본값
+        timezone: 'Asia/Seoul',
+        language: 'ko',
       },
       isInitialized: false,
-      isLoading: true, // 초기 로딩 상태
+      isLoading: true,
 
       setUserInfo: user => set({ user }),
-      setTokens: tokens => set({ tokens }),
+      setRefreshToken: token => set({ refreshToken: token }),
       setDeviceInfo: info =>
         set(state => ({
           device: { ...state.device, ...info },
@@ -102,8 +104,7 @@ export const useUserStore = create<UserStore>()(
       logout: () => {
         set(state => ({
           user: null,
-          tokens: null,
-          // device 정보는 로그아웃해도 유지 (기기 설정이므로)
+          refreshToken: null,
           device: state.device,
           isInitialized: true,
           isLoading: false,
@@ -111,11 +112,15 @@ export const useUserStore = create<UserStore>()(
       },
     }),
     {
-      name: SECURE_STORAGE_KEY, // 스토리지 Key
-      storage: createJSONStorage(() => secureStorage), // 커스텀 보안 스토리지 적용
-      partialize: state => ({ user: state.user, tokens: state.tokens }), // device값은 persist에서 제외 (매번 앱 켤때마다 갱신)
+      name: SECURE_STORAGE_KEY,
+      storage: createJSONStorage(() => secureStorage),
+      // RefreshToken + User만 Keychain에 영속 저장
+      // AccessToken은 TokenManager가 메모리에서 관리하므로 persist 대상 아님
+      partialize: state => ({
+        user: state.user,
+        refreshToken: state.refreshToken,
+      }),
       onRehydrateStorage: () => state => {
-        // Hydration(복구)이 끝난 후 실행
         if (state) {
           state.setInitialized(true);
           state.setLoading(false);
